@@ -81,15 +81,45 @@ function filtrarSenalesPorExpresionRegular(signals, expresionRegular) {
 
 
 
+
 // 4.Definir una función que retorne un número que mida la capacidad de una expresión de
 //entrada para filtrar una señal y excluir el resto.
 
-function medirCapacidadExpresion(expresionRegular, signals) {
-    const expresion = new RegExp(expresionRegular, 'i');
-    const senalesFiltradas = signals.filter((senal) => expresion.test(senal.MMSPATH));
-    
-    // Retornar el número de señales coincidentes
-    return senalesFiltradas.length;
+function medirCapacidadExpresion(expresion, signals) {
+    const expresionRegex = new RegExp(expresion, 'i');
+    const coincide = signals.filter((senal) => expresionRegex.test(senal.MMSPATH));
+    const noCoincide = signals.filter((senal) => !expresionRegex.test(senal.MMSPATH));
+
+    const capacidad = Math.min(coincide.length, noCoincide.length);
+    return capacidad;
+}
+
+
+
+
+// 5. Proponer para cada señal dadas, una expresión óptima para filtrarla. Una expresión es
+// óptima cuando usa el número mínimo de caracteres.
+
+function proponerExpresionOptima(signals) {
+    const expresionesOptimas = {};
+
+    signals.forEach((senal) => {
+        let expresionOptima = '';
+
+        for (let i = 0; i < senal.MMSPATH.length; i++) {
+            const substring = senal.MMSPATH.substring(0, i + 1);
+            const capacidad = medirCapacidadExpresion(substring, signals);
+
+            if (capacidad === 1) {
+                expresionOptima = substring;
+                break;
+            }
+        }
+
+        expresionesOptimas[senal.NOMBRE] = expresionOptima;
+    });
+
+    return expresionesOptimas;
 }
 
 const rutaArchivoCSV = './archivo de entrada.csv';
@@ -114,6 +144,12 @@ cargarDatosDesdeCSV(rutaArchivoCSV)
         // para filtrar una señal y excluir el resto.
         const capacidadExpresion = medirCapacidadExpresion(expresionRegular, signals);
         console.log(`Capacidad de la expresión regular "${expresionRegular}": ${capacidadExpresion}`);
+
+        // 5. Proponer para cada señal dada una expresión óptima para filtrarla.
+        const expresionesOptimas = proponerExpresionOptima(signals);
+
+        console.log('Expresiones óptimas para cada señal:');
+        console.table(expresionesOptimas);
     })
     .catch((error) => {
         console.error('Error al cargar los datos:', error);
