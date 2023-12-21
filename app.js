@@ -66,10 +66,21 @@ function mostrarArbol(signals) {
     imprimirNiveles(niveles);
 }
 
-// Llamar a la función para cargar los datos
+
+
+
+
+// 3. Implementar una opción de búsqueda que permita filtrar las señales dadas usando
+//expresiones regulares aplicadas a la columna MMSPATH.
+
+function filtrarSenalesPorExpresionRegular(signals, expresionRegular) {
+    const expresion = new RegExp(expresionRegular, 'i'); // 'i' para hacer la búsqueda insensible a mayúsculas/minúsculas
+
+    return signals.filter((senal) => expresion.test(senal.MMSPATH));
+}
+
 const rutaArchivoCSV = './archivo de entrada.csv';
 
-// Cargar los datos y luego mostrar el árbol
 cargarDatosDesdeCSV(rutaArchivoCSV)
     .then((signals) => {
         console.log('Datos cargados exitosamente:');
@@ -77,13 +88,14 @@ cargarDatosDesdeCSV(rutaArchivoCSV)
 
         // Llamar a la función para mostrar el árbol
         mostrarArbol(signals);
+
+        //filtrar las señales dadas usando expresiones regulares aplicadas a la columna MMSPATH.
+        const expresionRegular = 'AXONBAYApplication';
+        const senalesFiltradas = filtrarSenalesPorExpresionRegular(signals, expresionRegular);
+
+        console.log(`Señales filtradas por la expresión regular "${expresionRegular}":`);
+        console.table(senalesFiltradas);
     })
     .catch((error) => {
         console.error('Error al cargar los datos:', error);
     });
-    
-
-
-
-// 3. Implementar una opción de búsqueda que permita filtrar las señales dadas usando
-//expresiones regulares aplicadas a la columna MMSPATH.
